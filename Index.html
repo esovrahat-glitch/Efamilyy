@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Школьный помощник 5-Е</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--text:#1c2333;--muted:#6b7488;--accent:#3b6cf6;--soft:#e8eefe;--line:#e3e7f0;--now:#dff7e6;--nowt:#12703a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131c;--card:#1a1f2d;--text:#eef1f8;--muted:#9aa4bb;--accent:#7a9dff;--soft:#222a44;--line:#2a3147;--now:#143a24;--nowt:#6fe3a0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10131c;--card:#1a1f2d;--text:#eef1f8;--muted:#9aa4bb;--accent:#7a9dff;--soft:#222a44;--line:#2a3147;--now:#143a24;--nowt:#6fe3a0;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:1.5rem;margin:6px 0 2px}
+.sub{color:var(--muted);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{font-size:1.1rem;margin:0 0 10px}
+.clock{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.big{font-size:2rem;font-weight:700;color:var(--accent)}
+.status small{display:block;color:var(--muted)}
+.nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.nav button{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:14px;padding:14px 8px;font-size:1rem;cursor:pointer}
+.nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+table{width:100%;border-collapse:collapse}
+td,th{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.85rem}
+tr:last-child td{border-bottom:0}
+tr.now td{background:var(--now);color:var(--nowt);font-weight:700}
+.tip{color:var(--muted);font-size:.85rem;margin-top:2px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}
+.tabs button{border:1px solid var(--line);background:var(--soft);color:var(--text);padding:8px 14px;border-radius:999px;font-size:.95rem;cursor:pointer;flex:0 0 auto}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hint{color:var(--muted);font-size:.85rem;margin:8px 0 0}
+.item{background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.item b{display:block}.item small{color:var(--muted)}
+.item button{float:right;border:0;background:none;color:#d33;font-size:1.1rem;cursor:pointer}
+input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font-size:.95rem;margin:3px 0}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-size:1rem;cursor:pointer;margin-top:4px}
+.edit{background:var(--now);color:var(--nowt);border-radius:12px;padding:10px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.edit button{border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:5px 10px;cursor:pointer}
+footer{margin-top:26px;padding-top:18px;border-top:2px solid var(--line);text-align:center}
+footer h3{margin:0 0 12px;font-size:1rem;color:var(--muted);letter-spacing:.04em}
+.enter{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.enter button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px 18px;font-size:1rem;cursor:pointer}
+#login{margin-top:12px;display:none;max-width:260px;margin-left:auto;margin-right:auto}
+#msg{margin-top:10px;color:var(--muted);font-size:.9rem;min-height:1.3em;text-align:center}
+.sec{display:none}.sec.on{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎒 Школьный помощник 5-Е</h1>
+<p class="sub" id="date"></p>
+
+<div class="card"><div class="clock"><div class="big" id="time">--:--</div><div class="status" id="status"></div></div></div>
+
+<div id="editbar"></div>
+
+<div class="nav" id="nav">
+<button data-t="sched" class="on">📚 Расписание</button>
+<button data-t="bells">🔔 Звонки</button>
+<button data-t="hw">📝 Домашка</button>
+<button data-t="ann">📢 Объявления</button>
+</div>
+
+<div class="card sec on" id="s-sched">
+<h2>📚 Расписание уроков</h2>
+<div class="tabs" id="tabs"></div>
+<table id="lessons"><tbody></tbody></table>
+<p class="hint">Вторая смена, 2 четверть 2026/2027. Если в уроке было два предмета, показан один. 💡 — что взять с собой.</p>
+</div>
+
+<div class="card sec" id="s-bells">
+<h2>🔔 Расписание звонков</h2>
+<table id="bells"><thead><tr><th>Урок</th><th>Начало</th><th>Конец</th></tr></thead><tbody></tbody></table>
+</div>
+
+<div class="card sec" id="s-hw">
+<h2>📝 Домашние задания</h2>
+<div id="hwlist"></div>
+<div id="hwform" style="display:none"><input id="hws" placeholder="Предмет"><input id="hwt" placeholder="Что задали"><button class="btn" id="hwadd">Добавить</button></div>
+</div>
+
+<div class="card sec" id="s-ann">
+<h2>📢 Объявления класса</h2>
+<div id="annlist"></div>
+<div id="annform" style="display:none"><input id="annt" placeholder="Текст объявления"><button class="btn" id="annadd">Опубликовать</button></div>
+</div>
+
+<footer>
+<h3>Вход для главных</h3>
+<div class="enter">
+<button type="button" data-r="Староста">Староста 2026</button>
+<button type="button" data-r="Учитель">Учитель 2026</button>
+</div>
+<div id="login"><input id="code" type="password" placeholder="Код доступа"><button class="btn" id="go">Войти</button></div>
+<div id="msg"></div>
+</footer>
+</div>
+
+<script>
+var CODE="2026";
+var bells=[["1","13:10","13:55"],["2","14:00","14:45"],["3","14:50","15:35"],["4","15:45","16:30"],["5","16:35","17:20"]];
+var days=["Пн","Вт","Ср","Чт","Пт","Сб"];
+var DEF={
+plan:{"Пн":["Часы будущего","Родной язык","Воспитание","Литература","Музыка"],"Вт":["Математика","Science","Информатика","Кк-язык","История"],"Ср":["Математика","Science","Английский","Кк-язык","Узб-яз"],"Чт":["Рисование","Математика","Английский","Узб-яз","История"],"Пт":["Математика","Английский","Физкультура","Технология","Родной язык"],"Сб":["Математика","Родной язык","—","Узб-яз","Литература"]},
+tips:{"Математика":"Тетрадь, учебник, линейка, ручка","Родной язык":"Тетрадь и учебник","Воспитание":"Дневник","Литература":"Учебник, тетрадь, прочитать заданное","Музыка":"Учебник и тетрадь","Science":"Учебник, тетрадь, цветные карандаши","Информатика":"Тетрадь и ручка","Кк-язык":"Тетрадь и учебник","История":"Учебник и тетрадь","Английский":"Учебник, рабочая тетрадь, словарик","Узб-яз":"Учебник и тетрадь","Рисование":"Альбом, краски, кисти, карандаши","Физкультура":"Спортивная форма и сменная обувь","Технология":"","Часы будущего":""},
+hw:[],ann:[]};
+var S=JSON.parse(JSON.stringify(DEF)),edit=null,docRef=null,tab="sched",role=null;
+var cur=(new Date().getDay()+6)%7;if(cur>5)cur=0;
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function m(t){var a=t.split(":");return +a[0]*60+ +a[1]}
+function p2(n){return(n<10?"0":"")+n}
+function say(t){$("msg").textContent=t}
+function save(){
+ if(!docRef){say("Сохранение для всех пока недоступно: изменения видны только вам.");return}
+ try{var r=docRef.set(S);if(r&&r.catch)r.catch(function(){say("Не удалось сохранить: нужен доступ для записи.")})}catch(e){say("Не удалось сохранить.")}
+}
+var tb=document.querySelector("#bells tbody");
+bells.forEach(function(b,i){var tr=document.createElement("tr");tr.innerHTML="<td>"+b[0]+" урок</td><td>"+b[1]+"</td><td>"+b[2]+"</td>";tb.appendChild(tr)});
+var tabs=$("tabs");
+days.forEach(function(d,i){var b=document.createElement("button");b.textContent=d;b.onclick=function(){cur=i;drawSched()};tabs.appendChild(b)});
+function drawSched(){
+ [].forEach.call(tabs.children,function(b,i){b.className=i===cur?"on":""});
+ var h="",L=S.plan[days[cur]]||[];
+ L.forEach(function(s,i){
+  var tip=S.tips[s]||"",bl=bells[i]?bells[i][1]:"";
+  if(edit){h+="<tr><td>"+(i+1)+"</td><td><input data-k='n' data-i='"+i+"' value=\""+esc(s)+"\"><input data-k='t' data-i='"+i+"' placeholder='Подсказка (что взять)' value=\""+esc(tip)+"\"></td><td>"+bl+"</td></tr>"}
+  else{h+="<tr><td>"+(i+1)+"</td><td><b>"+esc(s)+"</b>"+(tip?"<div class='tip'>💡 "+esc(tip)+"</div>":"")+"</td><td style='color:var(--muted)'>"+bl+"</td></tr>"}
+ });
+ document.querySelector("#lessons tbody").innerHTML=h;
+}
+$("lessons").addEventListener("change",function(e){
+ var t=e.target,i=+t.dataset.i,L=S.plan[days[cur]];
+ if(t.dataset.k==="n"){L[i]=t.value}else{S.tips[L[i]]=t.value}
+ save();drawSched();
+});
+function drawHw(){
+ var h="";S.hw.slice().reverse().forEach(function(x){h+="<div class='item'>"+(edit?"<button data-d='hw' data-id='"+x.id+"'>✕</button>":"")+"<b>"+esc(x.s)+"</b>"+esc(x.t)+"<br><small>"+esc(x.d)+"</small></div>"});
+ $("hwlist").innerHTML=h||"<p class='hint'>Пока домашних заданий нет.</p>";
+ $("hwform").style.display=edit?"block":"none";
+}
+function drawAnn(){
+ var h="";S.ann.slice().reverse().forEach(function(x){h+="<div class='item'>"+(edit?"<button data-d='ann' data-id='"+x.id+"'>✕</button>":"")+esc(x.t)+"<br><small>"+esc(x.w)+", "+esc(x.d)+"</small></div>"});
+ $("annlist").innerHTML=h||"<p class='hint'>Пока объявлений нет.</p>";
+ $("annform").style.display=edit?"block":"none";
+}
+document.addEventListener("click",function(e){
+ var t=e.target,id=t.dataset&&t.dataset.id;
+ if(t.dataset&&t.dataset.d){var k=t.dataset.d;S[k]=S[k].filter(function(x){return String(x.id)!==id});save();render()}
+});
+$("hwadd").onclick=function(){
+ var s=$("hws").value.trim(),t=$("hwt").value.trim();if(!s||!t)return;
+ S.hw.push({id:Date.now(),s:s,t:t,d:new Date().toLocaleDateString("ru-RU")});$("hws").value="";$("hwt").value="";save();render();
+};
+$("annadd").onclick=function(){
+ var t=$("annt").value.trim();if(!t)return;
+ S.ann.push({id:Date.now(),t:t,w:edit,d:new Date().toLocaleDateString("ru-RU")});$("annt").value="";save();render();
+};
+function render(){
+ drawSched();drawHw();drawAnn();
+ $("editbar").innerHTML=edit?"<div class='edit'><span>✏️ Режим редактирования: "+edit+"</span><button id='out'>Выйти</button></div>":"";
+ if(edit)$("out").onclick=function(){edit=null;render()};
+}
+$("nav").addEventListener("click",function(e){
+ var t=e.target.dataset.t;if(!t)return;tab=t;
+ [].forEach.call($("nav").children,function(b){b.className=b.dataset.t===t?"on":""});
+ ["sched","bells","hw","ann"].forEach(function(k){$("s-"+k).className="card sec"+(k===t?" on":"")});
+});
+document.querySelectorAll(".enter button").forEach(function(b){
+ b.onclick=function(){role=b.dataset.r;$("login").style.display="block";$("code").value="";$("code").focus();say("Вход: "+role)}
+});
+$("go").onclick=function(){
+ if($("code").value===CODE){edit=role;$("login").style.display="none";say("");render()}else say("Неверный код.");
+};
+function tick(){
+ var n=new Date(),mm=n.getHours()*60+n.getMinutes();
+ $("time").textContent=p2(n.getHours())+":"+p2(n.getMinutes());
+ $("date").textContent=n.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"});
+ var st="Уроки ещё не начались",sm="До первого урока: "+(m(bells[0][1])-mm)+" мин";
+ [].forEach.call(tb.children,function(r){r.className=""});
+ if(mm>=m(bells[bells.length-1][2])){st="Уроки закончились";sm="Хорошего отдыха!"}
+ else if(mm<m(bells[0][1])&&m(bells[0][1])-mm>180)sm="Ещё много времени";
+ for(var i=0;i<bells.length;i++){
+  var s=m(bells[i][1]),e=m(bells[i][2]);
+  if(mm>=s&&mm<e){st="Идёт "+bells[i][0]+" урок";sm="До звонка: "+(e-mm)+" мин";tb.children[i].className="now";break}
+  if(i<bells.length-1&&mm>=e&&mm<m(bells[i+1][1])){st="Перемена";sm="До следующего урока: "+(m(bells[i+1][1])-mm)+" мин";break}
+ }
+ $("status").innerHTML=st+"<small>"+sm+"</small>";
+}
+function apply(snap){
+ var ex=typeof snap.exists==="function"?snap.exists():snap.exists;
+ if(!ex)return;
+ var d=typeof snap.data==="function"?snap.data():snap.data;
+ if(!d)return;
+ S={plan:d.plan||DEF.plan,tips:d.tips||DEF.tips,hw:d.hw||[],ann:d.ann||[]};render();
+}
+render();tick();setInterval(tick,20000);
+try{
+ if(window.claude&&claude.use){claude.use("db").then(function(db){
+  if(!db)return;docRef=db.doc("school/main");
+  try{docRef.onSnapshot(apply,function(){})}catch(e){}
+ }).catch(function(){})}
+}catch(e){}
+</script>
+</body>
+  </html>
+  
